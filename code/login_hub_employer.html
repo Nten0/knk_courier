@@ -1,0 +1,61 @@
+ <!DOCTYPE html>
+
+<html>   
+   <head>
+    <meta charset="UTF-8">
+    <title>Είσοδος Υπαλλήλου Transit Hub</title>   
+   </head>
+   
+   <body bgcolor = "#FFFFFF">  
+    <div class="login-page">       
+      <div class="form">
+       <h2><div align=center>Σύνδεση ως Υπάλληλος Transit Hub</div></h2>
+       <br>
+        <form action = "" method = "post">
+          <input type="text" id = "username" placeholder="username"/>
+          <input type="password" id = "password" placeholder="password"/>
+          <button type = "button" onclick="validateForm()">Σύνδεση</button>
+        </form>
+      </div>
+    </div>
+   </body>
+
+
+
+<footer>
+<link rel="stylesheet" href="css/login.css">
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    var username;
+    var password;
+    function validateForm() {
+
+      username = document.getElementById("username").value;
+      password = document.getElementById("password").value;
+
+      if (username == "" || password=="") {
+            alert("Username and Password must be filled out");
+            return false;
+        }
+      else {
+        $.ajax({
+        type: "POST",
+        url: "php/login_hub_employer.php",
+        data: {username,password},
+        complete: function(response) {
+             var temp = response.responseText;
+             console.log(temp);
+             if(temp.trim() == "Success")
+              window.location.href = "./webqr";
+             else
+              alert("Λάθος Username ή Password");
+            }
+          });
+        }
+      }
+</script>
+</footer>
+
+</html>

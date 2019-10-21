@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Δημιουργία Αποστολής</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">     
+	</head>
+	<body>
+		<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		        <ul class="nav navbar-nav">
+		            <li ><a class="navbar-brand" href="local_store.html">Τοπικό Κατάστημα</a></li>
+		          	<li class="active"><a href="create_shipment.html">Δημιουργία Νέας Αποστολής</a></li>
+		          	<li ><a href="track_order_local_store.html">Παρακολούθηση Αποστολής</a></li>
+		          	<li><a href="deliver_package_local_store.html">Παράδοση Δέματος</a></li>         
+		       	</ul>
+		        <ul class="nav navbar-nav navbar-right">
+		                <li><a href="index.php">Αποσύνδεση</a></li>
+		        </ul>
+		    </div>
+		</nav>
+
+		<div class="center">
+		    <button style="display: none;" button id="btn1" class="btn green " type="button" >Εκτύπωση Παραγγελίας</button>				
+				<h2 id="start"> Παρακαλώ Εισάγετε: </h2>	
+				<br><br>
+				<form action="/action_page_post.php" method="post">
+				 	  Διεύθυνση: <br> <input type="text" id="address" required>
+				 <br> Tαχυδρομικός Κώδικας: <br> <input type="text" id="TK" required>
+				 <br> Πόλη: <br> <input type="text" id="city" required>
+				 <br> Όνομα Παραλήπτη: <br> <input type="text" id="username" required>
+				 <br> <br>
+				  	  Τύπος Παράδοσης: <br><input type="radio" id="delivery_type" name ="delivery_type" value="Standard">Απλη παράδοση
+								 	  <input type="radio" id="delivery_type" name = "delivery_type" value="Express">Ταχεία Παράδοση
+					 
+				 <br><br> <button id="sub" class="btn green " type="button" onclick="validateForm()">Υποβολή</button>	 
+				 <br>  <br>  <br>
+				
+				 <p id ="info"> </p>
+				 <p id ="tracking_number"> </p>
+				 <div style="display: none;" id="qr">
+				 	<p id = "result"> </p>		 
+				 </div>
+				</form>	
+			</div>		
+	</body>
+	<footer>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> 
+	<link rel="stylesheet" href="css/style.css">
+	<!-- Latest compiled JavaScript -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+	
+
+		<script type="text/javascript">
+		var address;
+		var postal;
+		var city;
+		var username;
+		var delivery_type;
+		var full_address ;
+		var final_store;
+		var final_address;
+        var final_num; 
+        var final_id;
+        var days;
+        	function validateForm()
+		{
+			address = document.getElementById("address").value;	
+			postal= document.getElementById("TK").value;
+			city= document.getElementById("city").value;	
+			username = document.getElementById("username").value;
+			delivery_type= document.querySelector('input[name = "delivery_type"]:checked').value;
+
+			full_address = address +"," + city + "," + postal +",Ελλάδα" ;
+			console.log(full_address);	
+			geocodeAddress(full_address);	
+			
+		 var x = document.getElementById('sub');
+	 	x.style.display = 'none';
+	 	 var x = document.getElementById('btn1');
+	 	x.style.display = 'block';
+	 	 var x = document.getElementById('start');
+	 	x.innerHTML= "Φόρμα Παραγγελίας";
+		}
+
+      function geocodeAddress(address) {
+        var geocoder = new google.maps.Geocoder();
+        var gr = "gr";
+        geocoder.geocode({'address': address,"region":gr}, function(results, status) {
+          if (status === 'OK') {
+            x2 = results[0].geometry.location.lat();
+            y2 = results[0].geometry.location.lng();
+            console.log(x2,y2);
+            fetch(x2,y2);
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+      }
+     
+          function fetch(x2,y2){
+              $.getJSON('php/fetch_stores.php', function(data) {
+               data = JSON.stringify(data);
+               data = JSON.parse(data);
+
+                
+              var id= [data.length];               
+              var name = [data.length];               
+              var address = [data.length];               
+              var num = [data.length]; 
+              var phone = [data.length];               
+              var hub = [data.length];
+              var long = [data.length];
+              var lat =[data.length];
+
+             
+              for(var i = 0;i<data.length;i++)
+              {
+                 console.log(data[i].id);              
+	               id[i] = data[i].id;
+	               name[i] = data[i].name;
+	               address[i] = data[i].address;
+	               num[i] = data[i].number;
+	               phone[i] = data[i].phone;
+	               hub[i] = data[i].hubID;
+	               lat[i] = data[i].lat;
+	               long[i] = data[i].long;
+             }  
+             var min ;
+             var min_index ;
+       
+             console.log(x2);
+             console.log(y2);
+
+              for(var i = 0;i<data.length;i++)
+              {
+                var x1 = lat[i];
+                var y1 = long[i];
+             
+                console.log(x1);
+                console.log(y1);
+                var tmp1 = x2 - x1;
+                var tmp2 = y2 - y1;
+                tmp1 = Math.pow(tmp1,2);
+                tmp2 = Math.pow(tmp2,2);
+                tmp1 = tmp1+tmp2;
+                tmp1 = Math.sqrt(tmp1);
+                if(i==0)
+                {
+                  min = tmp1;
+                  min_index = i;
+                }
+                else if(tmp1<min)
+                {
+                  min = tmp1;
+                  min_index = i;
+                }               
+              } 
+               final_store = name[min_index];
+               final_id = id[min_index];
+               final_address = address[min_index];
+               final_num = num[min_index];
+              var final_hub = hub[min_index];
+              console.log(final_store);
+              console.log(final_hub); 
+               $.getJSON('php/fetch_nearest_hub.php', function(data) {
+               data = JSON.stringify(data);
+               data = JSON.parse(data);
+
+                
+              var id= [data.length];               
+              var name = [data.length];               
+              var final_hub_name;
+
+             
+              for(var i = 0;i<data.length;i++)
+              {          
+	               id[i] = data[i].id;
+	               name[i] = data[i].name;
+	               if(id[i] == final_hub)
+	               {
+	               	final_hub_name = name[i];
+	               	console.log(final_hub_name);
+	               }
+             } 
+             do_dijksta(final_hub_name); 
+
+              });
+            });
+          }
+
+          function do_dijksta(hub){
+          	console.log(hub);
+          	console.log(delivery_type)
+		  $.ajax({
+			  type: "POST",
+			  url: "php/dijkstra.php",
+			  data: {hub,delivery_type},
+			  complete: function(data){
+			            console.log(data.responseText);
+			            res =data.responseText.split(",");
+			            console.log(res);
+			            var temp;
+
+			            for (var i = 0; i<res.length;i++)
+			            {
+			            	if(i<res.length-2)
+			            	{
+				            	if (i == 0)
+				            	{
+				            		temp = "Εκτίμηση Διαδρομής: "
+				            	}
+				            	if(i<res.length-2)
+				            	{
+				            		temp+="Hub "
+				            	}
+				            	
+				            	temp+=res[i];
+				            	if(i<res.length-3)
+				            	{
+				            		temp +=" -> ";
+				            	}
+				            	else
+				            	{
+				            		temp += "</br>";
+				            	}
+				            }
+			            	else if( i == res.length-2)
+			            	{
+			            		temp+="Εκτίμηση Χρόνου: "+ res[i]+ " Ημέρες" + "<br>";
+			            	}
+			            	else
+			            	{
+			            		temp+="Εκτίμηση Κόστους: "+ res[i]+ " Ευρώ" + "</br>";
+			            	}
+			            }
+			            temp += "Παραλαβή από κατάστημα: <br>"+final_store +": "+ final_address +","+ final_num;
+			            console.log(temp);
+			            days = res[res.length-2];
+			            console.log("days =",days);
+			           
+			            document.getElementById("info").innerHTML = temp;
+			            create_tr_number();
+			           	
+			           }
+			        });			           	
+				}
+
+				function create_tr_number()
+				{
+					
+					 $.ajax({
+					  type: "POST",
+					  url: "php/get_tracking_number.php",
+					  data: {city},
+					  complete: function(data){
+					            console.log(data.responseText);
+					            tracking_number = data.responseText;
+					            document.getElementById("tracking_number").innerHTML = "Τracking Number: "+ data.responseText;
+
+
+					            var x = document.getElementById('qr');
+					    if (x.style.display === 'none') {
+					        x.style.display = 'block';
+					    }
+					    
+					    document.getElementById("qr").innerHTML = '<img id = "qr1" src ="php/qrcode.php">';
+
+					    	create_shipment(tracking_number);
+					    }
+					           
+					           	
+					           
+					        });			  
+
+				}
+
+				function create_shipment(tracking_number)
+				{
+					console.log(tracking_number);
+					 $.ajax({
+					  type: "POST",
+					  url: "php/create_shipment.php",
+					  data: {tracking_number,final_id,delivery_type,username,days},
+					  complete: function(data){
+					            console.log(data.responseText);
+					            
+
+					           
+					           	
+					           }
+					        });			 
+
+				}
+
+			  $( "#btn1" ).click(function() {
+				 //PrintElem("qr");
+				  var x = document.getElementById('btn1');
+	 	x.style.display = 'none';
+					window.print();
+				});
+
+		</script>
+		 <script async defer
+     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC33ScfX25G4ydvJNc6EGq6qgh1IyGj7mo	&callback">
+    </script>
+	
+	</footer>
+</html>

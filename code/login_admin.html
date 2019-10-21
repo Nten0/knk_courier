@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>   
+<head>
+  <meta charset="UTF-8">  
+  <title> Είσοδος Διαχειριστή </title>
+</head>
+   
+<body bgcolor = "#FFFFFF">  
+  <div class="login-page">       
+   <div class="form">
+    <h2><div align=center>Σύνδεση ως Διαχειριστής</div></h2>
+    <br>
+    <form action = "" method = "post">
+      <input type="text" id = "username" placeholder="Username"/>
+      <input type="password" id = "password" placeholder="Password"/>
+      <button type = "button" onclick="validateForm()">Σύνδεση</button>
+    </form>
+   </div>
+  </div>
+</body>
+
+<footer>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> 
+<link rel="stylesheet" href="css/login.css">
+<!-- Latest compiled JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script>
+    var username;
+    var password;
+    function validateForm() 
+    {
+      username = document.getElementById("username").value;
+      password = document.getElementById("password").value;
+      if (username == "" || password=="")
+      {
+        alert("Username and Password must be filled out");
+        return false;
+      }
+      else
+      {
+        $.ajax({
+          type: "POST",
+          url: "php/login_admin.php",
+          data: {username,password},
+          complete: function(response)
+          {
+               var temp = response.responseText;
+               if(temp.trim() == "Success")
+                window.location.href = "./admin.php";
+               else
+                alert("Λάθος Username ή Password");
+          }
+        });
+      }
+    }
+</script>
+</footer>
+
+</html>

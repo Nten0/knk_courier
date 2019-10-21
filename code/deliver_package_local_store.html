@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Παράδοση Αποστολής</title>
+
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+
+        <ul class="nav navbar-nav">
+            <li ><a class="navbar-brand" href="local_store.html">Τοπικό Κατάστημα</a></li>
+          <li><a href="create_shipment.html">Δημιουργία Νέας Αποστολής</a></li>
+          <li><a href="track_order_local_store.html">Παρακολούθηση Αποστολής</a></li>
+          <li  class="active"><a href="deliver_package_local_store.html">Παράδοση Δέματος</a></li>         
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+                <li><a href="index.php">Αποσύνδεση</a></li>
+        </ul>
+      </div>
+    </nav>
+<div class="center">
+<h3>Παρακαλώ Εισάγετε Tracking Number:</h3>
+<input id="tracking_no">
+<br>
+<button class="btn green" onclick="validateForm()">Υποβολή</button>
+<div id="input"></div>
+<div id = "mylist"></div>
+</div>
+</body>
+
+
+
+<footer>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> 
+	<link rel="stylesheet" href="css/style.css">
+	<!-- Latest compiled JavaScript -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script>
+		var tracking_no;
+		var locations;
+		var delivered;
+
+		function validateForm() {
+		    tracking_no = document.getElementById("tracking_no").value;
+		    
+		   
+		    if (tracking_no == "") {
+		        alert("Tracking number must be filled out");
+		        return false;
+		    }
+		    else
+		    {
+		    	 deliver();
+		    }
+
+
+		
+		
+		 function deliver(){
+		 	//alert(tracking_no);
+
+		  $.ajax({
+			  type: "POST",
+			  url: "php/deliver.php",
+			  data: {tracking_no},
+			  complete: function(data){
+
+			           		alert("Παραδόθηκε Επιτυχώς");		        
+					    
+					    
+
+			           }
+			           	});
+			           	
+}
+}
+</script>
+ 
+
+</footer>
+</html>
